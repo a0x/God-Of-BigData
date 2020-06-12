@@ -83,7 +83,7 @@ MapReduce框架由一个单独的master JobTracker 和每个集群设备一个sl
 附上Scala实现的计算词频的Scala源码
 
     
-```
+```scala
 import java.io.IOException
 import java.util.StringTokenizer
 
@@ -97,43 +97,43 @@ import org.apache.hadoop.mapreduce.{Job, Mapper, Reducer}
 import scala.collection.JavaConversions
 
 object WordCount {
-def main(args: Array[String]): Unit = {
-val job = new Job(new Configuration(), "WordCount")
-job.setJarByClass(classOf[WordMapper]);
-job.setMapperClass(classOf[WordMapper]);
-job.setCombinerClass(classOf[WordReducer]);
-job.setReducerClass(classOf[WordReducer]);
-job.setOutputKeyClass(classOf[Text]);
-job.setOutputValueClass(classOf[IntWritable]);
-job.setNumReduceTasks(1)
-FileInputFormat.addInputPath(job, new Path(args(0)));
-FileOutputFormat.setOutputPath(job, new Path(args(1)));
-System.exit(job.waitForCompletion(true) match { case true => 0
-case false => 1
-});
-}
+  def main(args: Array[String]): Unit = {
+    val job = new Job(new Configuration(), "WordCount")
+    job.setJarByClass(classOf[WordMapper]);
+    job.setMapperClass(classOf[WordMapper]);
+    job.setCombinerClass(classOf[WordReducer]);
+    job.setReducerClass(classOf[WordReducer]);
+    job.setOutputKeyClass(classOf[Text]);
+    job.setOutputValueClass(classOf[IntWritable]);
+    job.setNumReduceTasks(1)
+    FileInputFormat.addInputPath(job, new Path(args(0)));
+    FileOutputFormat.setOutputPath(job, new Path(args(1)));
+    System.exit(job.waitForCompletion(true) match { case true => 0
+    case false => 1
+    });
+  }
 }
 
 class WordMapper extends Mapper[Object, Text, Text, IntWritable] {
-val one = new IntWritable(1)
+  val one = new IntWritable(1)
 
-@throws[IOException]
-@throws[InterruptedException]
-override def map(key: Object, value: Text, context: Mapper[Object, Text, Text, IntWritable]#Context) = {
-val stringTokenizer = new StringTokenizer(value.toString());
-while (stringTokenizer.hasMoreTokens()) {
-context.write(new Text(stringTokenizer.nextToken()), one);
-}
-}
+  @throws[IOException]
+  @throws[InterruptedException]
+  override def map(key: Object, value: Text, context: Mapper[Object, Text, Text, IntWritable]#Context) = {
+    val stringTokenizer = new StringTokenizer(value.toString());
+    while (stringTokenizer.hasMoreTokens()) {
+      context.write(new Text(stringTokenizer.nextToken()), one);
+    }
+  }
 }
 
 class WordReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
-@throws[IOException]
-@throws[InterruptedException]
-override def reduce(key: Text, values: java.lang.Iterable[IntWritable], context: Reducer[Text, IntWritable, Text, IntWritable]#Context) = {
-import JavaConversions.iterableAsScalaIterable
-context.write(key, new IntWritable(values.map(x=>x.get()).reduce(_+_)));
-}
+  @throws[IOException]
+  @throws[InterruptedException]
+  override def reduce(key: Text, values: java.lang.Iterable[IntWritable], context: Reducer[Text, IntWritable, Text, IntWritable]#Context) = {
+    import JavaConversions.iterableAsScalaIterable
+    context.write(key, new IntWritable(values.map(x=>x.get()).reduce(_+_)));
+  }
 }
 ```
 

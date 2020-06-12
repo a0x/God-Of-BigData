@@ -18,40 +18,39 @@ MapReduce是一种非常简单又非常强大的编程模型。
 
 WordCount的MapReduce程序如下。
 
-```
+```java
 public class WordCount {
 
-public static class TokenizerMapper
-extends Mapper<Object, Text, Text, IntWritable>{
+  public static class TokenizerMapper
+  extends Mapper<Object, Text, Text, IntWritable>{
 
-private final static IntWritable one = new IntWritable(1);
-private Text word = new Text();
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
 
-public void map(Object key, Text value, Context context
-) throws IOException, InterruptedException {
-StringTokenizer itr = new StringTokenizer(value.toString());
-while (itr.hasMoreTokens()) {
-word.set(itr.nextToken());
-context.write(word, one);
-}
-}
-}
+    public void map(Object key, Text value, Context context
+    ) throws IOException, InterruptedException {
+      StringTokenizer itr = new StringTokenizer(value.toString());
+      while (itr.hasMoreTokens()) {
+        word.set(itr.nextToken());
+        context.write(word, one);
+      }
+    }
+  }
 
-public static class IntSumReducer
-extends Reducer<Text,IntWritable,Text,IntWritable> {
-private IntWritable result = new IntWritable();
+  public static class IntSumReducer
+  extends Reducer<Text,IntWritable,Text,IntWritable> {
+    private IntWritable result = new IntWritable();
 
-public void reduce(Text key, Iterable<IntWritable> values,
-Context context
-) throws IOException, InterruptedException {
-int sum = 0;
-for (IntWritable val : values) {
-sum += val.get();
-}
-result.set(sum);
-context.write(key, result);
-}
-}
+    public void reduce(Text key, Iterable<IntWritable> values, Context context
+    ) throws IOException, InterruptedException {
+      int sum = 0;
+      for (IntWritable val : values) {
+        sum += val.get();
+      }
+      result.set(sum);
+      context.write(key, result);
+    }
+  }
 }
 ```
 其核心是一个map函数，一个reduce函数。
@@ -137,10 +136,10 @@ MapReduce计算框架处理数据合并与连接的操作就在map输出与reduc
 
 MapReduce框架缺省的Partitioner用key的哈希值对reduce任务数量取模，相同的key一定会落在相同的reduce任务id上，实现上，这样的Partitioner代码只需要一行，如下所示。
 
-```
+```java
 /** Use {@link Object#hashCode()} to partition. */ 
 public int getPartition(K2 key, V2 value, int numReduceTasks) { 
-return (key.hashCode() & Integer.MAX_VALUE) % numReduceTasks; 
+  return (key.hashCode() & Integer.MAX_VALUE) % numReduceTasks; 
 }
 ```
 
